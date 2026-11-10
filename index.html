@@ -1,0 +1,446 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini POS - Kasir Digital</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #172033;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            width: min(1150px, 92%);
+            margin: auto;
+        }
+
+        h1, h2, h3, p {
+            margin-top: 0;
+        }
+
+        main {
+            padding: 25px 0;
+        }
+
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card, .panel {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .metric-value {
+            font-size: 23px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .panel h3 {
+            margin-bottom: 15px;
+        }
+
+        input, button {
+            font: inherit;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 13px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .product {
+            border: 1px solid #e2e8f0;
+            padding: 13px;
+            border-radius: 10px;
+        }
+
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .product-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .safe {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .low {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .out {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .qty {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .qty button {
+            padding: 5px 9px;
+            background: #e2e8f0;
+        }
+
+        .totals {
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .total-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+        }
+
+        .pay-option {
+            background: #e2e8f0;
+        }
+
+        .pay-option.active {
+            background: #dbeafe;
+            color: #1d4ed8;
+            outline: 1px solid #2563eb;
+        }
+
+        .change-box {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .empty {
+            color: #64748b;
+            text-align: center;
+            padding: 20px;
+        }
+
+        dialog {
+            width: min(400px, 90%);
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        dialog::backdrop {
+            background: #0008;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        #receipt {
+            display: none;
+        }
+
+        @media(max-width: 750px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 450px) {
+            .heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .product-bottom {
+                align-items: stretch;
+                flex-direction: column;
+            }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #receipt, #receipt * {
+                visibility: visible;
+            }
+
+            #receipt {
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                font-family: monospace;
+                color: black;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>▦ Mini POS</h1>
+        <p>Kasir Digital - SMK Negeri 9 Medan</p>
+    </div>
+</header>
+
+<main class="container">
+
+    <div class="heading">
+        <div>
+            <h2>Dashboard Kasir</h2>
+            <p>Kelola produk, stok, dan transaksi.</p>
+        </div>
+        <button class="primary" id="openProductForm">+ Tambah Produk</button>
+    </div>
+
+    <section class="metrics">
+        <div class="card">
+            Omzet Hari Ini
+            <div class="metric-value" id="revenueMetric">Rp0</div>
+        </div>
+
+        <div class="card">
+            Total Sisa Stok
+            <div class="metric-value" id="stockMetric">0</div>
+        </div>
+
+        <div class="card">
+            Jumlah Transaksi
+            <div class="metric-value" id="transactionMetric">0</div>
+        </div>
+    </section>
+
+    <section class="layout">
+
+        <div class="panel">
+            <h3>Daftar Produk</h3>
+
+            <input type="search" id="searchInput"
+                placeholder="Cari produk...">
+
+            <div class="product-grid" id="productGrid"></div>
+        </div>
+
+        <div class="panel">
+            <h3>🛒 Keranjang</h3>
+
+            <button class="secondary" id="clearCart">
+                Kosongkan Keranjang
+            </button>
+
+            <div id="cartList"></div>
+
+            <div class="totals">
+                <div class="total-line">
+                    <span>Subtotal</span>
+                    <strong id="subtotal">Rp0</strong>
+                </div>
+
+                <div class="total-line">
+                    <strong>Total</strong>
+                    <strong id="grandTotal">Rp0</strong>
+                </div>
+            </div>
+
+            <h3>Metode Pembayaran</h3>
+
+            <div class="payment-options" id="paymentOptions">
+                <button class="pay-option active" data-method="Tunai">
+                    Tunai
+                </button>
+
+                <button class="pay-option" data-method="QRIS">
+                    QRIS
+                </button>
+
+                <button class="pay-option" data-method="Transfer">
+                    Transfer
+                </button>
+            </div>
+
+            <div id="cashArea">
+                <p>Uang Diterima</p>
+                <input type="number" id="cashInput"
+                    min="0" placeholder="Masukkan nominal">
+                
+                <div class="change-box">
+                    <span>Kembalian</span>
+                    <strong id="changeValue">Rp0</strong>
+                </div>
+            </div>
+
+            <p id="paymentHint">
+                Masukkan uang yang diterima.
+            </p>
+
+            <button class="primary" id="checkoutBtn" style="width:100%">
+                Proses Pembayaran
+            </button>
+        </div>
+
+    </section>
+</main>
+
+<dialog id="productDialog">
+    <form id="productForm">
+        <h3 id="dialogTitle">Tambah Produk</h3>
+
+        <input type="hidden" id="productId">
+
+        <label>Nama Produk</label>
+        <input type="text" id="productName" required maxlength="60">
+
+        <label>Harga Produk</label>
+        <input type="number" id="productPrice" min="1" required>
+
+        <label>Jumlah Stok</label>
+        <input type="number" id="productStock" min="0" required>
+
+        <div class="actions">
+            <button type="button" class="secondary" id="cancelDialog">
+                Batal
+            </button>
+
+            <button type="submit" class="primary">
+                Simpan
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<div id="receipt"></div>
+
+<footer>
+    Mini POS - Aplikasi Kasir Digital Offline
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
